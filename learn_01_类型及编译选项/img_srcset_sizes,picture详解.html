@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>img标签 srcset sizes属性与picture标签详解</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- img的srcset,sizes属性与picture都是用于开发响应式图片的很方便的用法 -->
+  <!-- 
+    src属性是用于兜底的,如果不支持srcset或者条件不匹配就使用src的图片 
+    这里我们单加srcset属性进行测试
+    这里的w其实可以理解为屏幕屏幕密度!  比如当你的屏幕密度为2时 当前的图片大小为128
+    那么实际加载的图片为256 因为128*2=256  所以还可以使用这个属性来计算屏幕密度
+    比如我当前的屏幕在102px时加载128的图片,但是在103时加载256的图片 所以103*x>=256 所以x≈2.48
+  -->
+  <!-- <img src="https://www.zhangxinxu.com/study/201410/mm-width-128px.jpg" alt="test图片" srcset="
+      https://www.zhangxinxu.com/study/201410/mm-width-128px.jpg 128w,
+      https://www.zhangxinxu.com/study/201410/mm-width-256px.jpg 256w,
+      https://www.zhangxinxu.com/study/201410/mm-width-512px.jpg 512w
+    "> -->
+
+  <!-- 
+    这里使用测试sizes属性,一般sizes,srcset都是配合使用的
+    这里的sizes的意思为  当屏幕<=360px时 设置当前img的宽度为340px
+    当屏幕宽度>=1500px时 设置当前的img为102px
+    当上面两个条件都不匹配时 img为205px  当前只是用于测试没有逻辑
+    所以在当前的屏幕密度下  屏幕宽度小于360时都是 360*2.48>512 匹配使用512w srcset
+    当屏幕大于1500px时 128<102*2.48<256 所以匹配 128w
+    当宽度大于360小于1500时  256<205*2.48<512 所以匹配256w
+    这里出了一点问题哦 这里得出的205匹配的时 512w 说明我这个屏幕密度是算错了的 
+    这里不断的进位 得到应该是非常接近 2.5的屏幕密度  这里就算他2.5就行了
+    将205改成204.8就对了  204.8*2.5=512
+   -->
+  <!-- <img src="https://www.zhangxinxu.com/study/201410/mm-width-128px.jpg" alt="test图片" srcset="
+      https://www.zhangxinxu.com/study/201410/mm-width-128px.jpg 128w,
+      https://www.zhangxinxu.com/study/201410/mm-width-256px.jpg 256w,
+      https://www.zhangxinxu.com/study/201410/mm-width-512px.jpg 512w
+    " sizes="
+      (max-width:360px) 340px,
+      (min-width:1500px) 102px,
+      204.8032px
+    "> -->
+
+
+  <!-- 
+      picture标签中包含零个或多个source元素和一个img元素,浏览器会选择最匹配的source元素,如果
+      没有匹配的就选择img元素  用于兜底  例如下图
+      当视图宽度大于800时就显示 source的图片 不然就显示img的图片 这个功能使用img的srcset也可以完成
+      但是picture还可以用于检查图片的类型
+     -->
+  <picture>
+    <source srcset="https://interactive-examples.mdn.mozilla.net/media/cc0-images/surfer-240-200.jpg"
+      media="(min-width: 800px)">
+    <img src="https://interactive-examples.mdn.mozilla.net/media/cc0-images/painted-hand-298-332.jpg" alt="" />
+  </picture>
+
+  <!-- 
+    比如这个例子: 如果用户代理不支持指定的类型，那么这个 <source> 元素会被跳过。使用img标签
+   -->
+  ​<picture>
+    <source srcset="mdn-logo.svg" type="image/svg+xml">
+    <img src="mdn-logo.png" alt="MDN">
+  </picture>
+
+
+</body>
+
+</html>
