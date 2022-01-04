@@ -17,4 +17,30 @@ interface Names {
   // [j: string]: string; // *会报错，属于重复声明了，不想上面那样key的类型变了。
 }
 
+// !还可以使用接口定义函数 之前一直没有见过这样的方式。
+interface Add {
+  (x: number, y: number): number;
+}
+
+const add: Add = (a, b) => a + b;
+
+// *还可以定义混合类型的 interface
+interface Lib {
+  (): void;
+
+  version: string;
+
+  doSomething(): void;
+}
+
+// *这样的 interface 应该像下面一样进行使用
+function getLib() {
+  // 这里 ts 会报错，因为 Lib 还有 version 和 doSomething 属性和方法，但是这里的赋值并不能体现这一点。所以报错了
+  let lib: Lib = (() => {}) as Lib;
+  lib.version = '1.0';
+  lib.doSomething = () => {
+    console.log('do something');
+  };
+}
+
 export {};
