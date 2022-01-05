@@ -67,6 +67,7 @@ class C implements AutoInterface {
 }
 
 // !这一步也太魔幻了 不知道具体的解释是什么，我这里猜测一下：应该就是从左向右执行， Bus 首先继承于 Auto ，然后 Bus 还需要实现 AutoInterface 因为 Bus 继承于 Auto 所以已经有了 state ，然后再实现 AutoInterface 时，就不需要再声明 state 了，直接声明一个 state3 就可以了。 不清楚是不是这样  也有可能是 Auto 先实现 AutoInterface ? 是一个先后顺序的问题
+// TODO 看一下这个网址 好像有类似的代码 https://blog.csdn.net/hd101367816/article/details/108813941
 class Bus extends Auto implements AutoInterface {
   state3: number = 1;
 }
