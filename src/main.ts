@@ -5,7 +5,9 @@ import './style.css';
 // import './geekTimeTS/1.basicType'; // 需要查看哪个ts文件就直接引入就可以了。
 // import './geekTimeTS/2.enumType';
 // import './geekTimeTS/3.interface';
-import './geekTimeTS/4.function';
+// import './geekTimeTS/4.function';
+// import './geekTimeTS/5.class';
+import './geekTimeTS/6.class-interface';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 
