@@ -40,7 +40,7 @@ enum Message {
 
 console.log(Message);
 
-// *一把来说枚举的值是不能进行修改的，作为常量使用
+// *一般来说枚举的值是不能进行修改的，作为常量使用
 // Role.Maintainer = 10000; // error
 enum Char {
   // 这三个是常量变量 会在编译阶段进行计算
@@ -112,5 +112,6 @@ const e3: E.b = 2;
 // *这个东西也太骚了把  字符串枚举类型 的值，只能为字符串枚举的成员，不能是number，不能是string
 const g1: G = G.a; // 这样才不会报错
 console.log(g1); // 输出 a
+// const g2: G = 'a'; // 会报错
 
 export {};
