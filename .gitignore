@@ -5,3 +5,6 @@ dist-ssr
 .idea
 .vscode
 *.log
+
+/learn_03_react+ts实战/.idea
+/learn_03_react+ts实战/learn/node_modules
