@@ -15,8 +15,31 @@ type IReadonly<T> = {
 
 // *4. Record<K extends keyof any, T> 将 K 中所有属性的值转化为 T 类型
 type IRecord<K extends keyof any, T> = {
-  [P in K]: T;
+    [P in K]: T;
 };
+
+interface PageInfo {
+  title: string;
+}
+
+type Page = 'home' | 'about' | 'contact'; // 也可以替换成 对象
+
+const record: IRecord<Page, PageInfo> = {
+  about: { title: 'about' },
+  contact: { title: 'contact' },
+  home: { title: 'home' },
+};
+
+// *5. Pick<T, U extends keyof T> 将 T 类型中的属性选出来，
+type IPick<T, U extends keyof T> = {
+  [I in U]: T[I];
+};
+
+// *6. Exclude<T, U> 将 T 中的 U 类型排除出去
+type IExclude<T, U> = T extends U ? never : T;
+
+// *这里的 IExclude 其实是这样的 'a' extends 'b'|'c'|'d' ? never : 'a' | 'b' extends 'b'|'c'|'d' ? never : 'b' | 'c' extends 'b'|'c'|'d' ? never : 'c' 所以得出结果是 'a'
+const exclude: IExclude<'a' | 'b' | 'c', 'b' | 'c' | 'd'> = 'a';
 
 
 // *7. Extract<T, U> extract 提取，从 T 中提取 U
