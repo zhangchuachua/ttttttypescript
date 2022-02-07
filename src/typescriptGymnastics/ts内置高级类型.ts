@@ -84,6 +84,7 @@ interface A {
   e: null;
 }
 
+// *这里对 A 接口没有起作用，说明 NonNullable 对对象不起作用
 const aNonNullable: INonNullable<A> = {
   b: 0, c: "", d: {}, e: null
 };
