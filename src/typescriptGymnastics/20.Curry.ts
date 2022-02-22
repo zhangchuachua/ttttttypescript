@@ -3,7 +3,7 @@ export type Curry<
   F extends (...args: any[]) => any,
   P extends any[] = Parameters<F>,
   R = ReturnType<F>
-> = P extends [infer First, ...infer Rest]
+> = P extends [infer First, ...infer Rest]// *满足这个条件的话 就说明当前 P 数组长度至少为 1
   ? Rest['length'] extends 0
     ? F
     : (...args: [First]) => Curry<(...args: Rest) => R>// ! ts 中函数参数不能通过字符串拼接定义名称即 (`arg${P['length']}`) => any，但是可以使用 (...args: [First]) => any
