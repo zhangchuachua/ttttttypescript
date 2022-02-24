@@ -5,4 +5,4 @@ type TrimLeft<V extends string> = V extends `${infer R} ` ? TrimLeft<R> : V;
 type Trim<V extends string> = TrimLeft<TrimRight<V>>;
 
 // 测试用例
-const a: Trim<' semlinker '> = 'semlinker'
+const a: Trim<' semlinker '> = 'semlinker';

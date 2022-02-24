@@ -6,20 +6,16 @@ interface Cpt1Props {
 }
 
 export const Cpt1 = ({ count, children }: Cpt1Props): ReactElement => {
-  return <div>
-    component1
-  </div>
-}
+  return <div>component1</div>;
+};
 
 interface Cpt2Props {
-  count: number,
+  count: number;
 }
 
 export const Cpt2: FC<Cpt2Props> = ({ count, children }) => {
-  return <div>
-    component2
-  </div>
-}
+  return <div>component2</div>;
+};
 
 /**
  * 以上就是两种函数组件的写法

@@ -33,23 +33,23 @@
 // b = <string>a
 
 /*
-* 如果函数没有限制返回类型  函数会自动判断返回的类型
-* */
+ * 如果函数没有限制返回类型  函数会自动判断返回的类型
+ * */
 // function fn(a: number) {
 //     if (a) return true
 //     else return '123'
 // }
 
 /*
-* void 表示返回值为空 返回undefined 或者不返回都不会报错  返回null会报错! 视频中没有报错
-* */
+ * void 表示返回值为空 返回undefined 或者不返回都不会报错  返回null会报错! 视频中没有报错
+ * */
 // function fn(): void {
 //     return
 // }
 
 /*
-* 注意 never表示不能返回任何东西 而且不能将该函数执行到底  主要用来抛出错误
-* */
+ * 注意 never表示不能返回任何东西 而且不能将该函数执行到底  主要用来抛出错误
+ * */
 // 如果有其他的业务逻辑即使什么都不返回也会报错  A function returning 'never' cannot have a reachable end point.
 // 表示返回never的函数不能有可到达的终点 不行执行到底
 // function fn(): never {
@@ -57,8 +57,8 @@
 // }
 
 /*
-* object 如果单纯的只是确定类型为一个对象的话 那么给他赋值空对象 函数 数组都不会报错 因为js中这些都属于对象
-* */
+ * object 如果单纯的只是确定类型为一个对象的话 那么给他赋值空对象 函数 数组都不会报错 因为js中这些都属于对象
+ * */
 // let a: object
 // a = {}
 // a = function () {
@@ -72,8 +72,8 @@
 // a = {name: 'zhangxu', b: 123, c: true}
 
 /*
-* Function类型 指定变量的类型为函数  但是与object一样 意义不大
-* */
+ * Function类型 指定变量的类型为函数  但是与object一样 意义不大
+ * */
 // let a: Function
 // a = function () {
 // }
@@ -81,21 +81,21 @@
 // let a: (n1: number, n2: number) => number
 
 /*
-* Array类型  注意 let a:Array会报错 必须添加范型限制
-* */
+ * Array类型  注意 let a:Array会报错 必须添加范型限制
+ * */
 // let a:[]
 // let a:number[]
 // let a: Array<number>
 
 /*
-* 元组tuple 元组就是固定长度的数组
-* */
+ * 元组tuple 元组就是固定长度的数组
+ * */
 // let a: [string, string]  // 这里就固定了长度为2
 // a = ['1', '2','3']
 
 /*
-* 枚举enum 类型
-* */
+ * 枚举enum 类型
+ * */
 // enum Gender { // 这里进行定义枚举类型
 //     Male, // 注意 这里真的就只是赋值了一个0
 //     Female = 2,// 可以手动赋值  如果还有下面的会进行递增
@@ -113,15 +113,14 @@
 // let a: { name: string, gender: Gender }
 
 /*
-* & 表示同时 一般来说 都是下面这样使用
-* */
+ * & 表示同时 一般来说 都是下面这样使用
+ * */
 // let a: { name: string } & { age: number }  // 这里就规定了a由两个对象内的属性组成 后面学了接口很有用
 // a = {name: 'zhangxu', age: 21}
 
 /*
-* 类型别名  也就相当于可以自定义类型组合了
-* */
+ * 类型别名  也就相当于可以自定义类型组合了
+ * */
 // type myType = string // 这里给string起了一个别名 后面就可以用这个别名代替string
 // let a: myType
 // a = '123'
-

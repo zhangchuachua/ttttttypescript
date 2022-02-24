@@ -16,12 +16,12 @@ export type NaiveFlat2<T extends any[]> = {
 }[number];
 // !递归 遍历更深的数组。 假设例子为：[[['a']], ['b', ['c']], 'd', [[[[[[['d']]]], 'e']]]] 在 [Index in keyof T] 时，其实还是遍历四次，但是四次的结果为 ['a','b'|'c', 'd', 'd'|'e'] 所以最后的结果为 'a' | 'b' | 'c' | 'd' | 'e'
 export type DeepFlat<T extends any[]> = {
-  [Index in keyof T]: T[Index] extends any[]
-    ? DeepFlat<T[Index]>
-    : T[Index];
+  [Index in keyof T]: T[Index] extends any[] ? DeepFlat<T[Index]> : T[Index];
 }[number];
 
 // 测试用例：
 type NaiveResult = NaiveFlat2<[['a'], ['b', 'c'], ['d']]>; // 'a' | 'b' | 'c' | 'd'
 const aaa: NaiveResult = 'a';
-type deepResult = DeepFlat<[[['a']], ['b', ['c']], 'd', [[[[[[['d']]]], 'e']]]]>;
+type deepResult = DeepFlat<
+  [[['a']], ['b', ['c']], 'd', [[[[[[['d']]]], 'e']]]]
+>;

@@ -11,7 +11,13 @@ interface Foo {
 
 // *这道题需要除去所有的索引签名
 export type RemoveIndexSignature<T> = {
-  [index in keyof T as string extends index ? never : number extends index ? never : symbol extends index ? never : index]: T[index];
+  [index in keyof T as string extends index
+    ? never
+    : number extends index
+    ? never
+    : symbol extends index
+    ? never
+    : index]: T[index];
 };
 
 // *这里不能使用 Exclude 因为 Exclude 的源码是 type Exclude<T, U> = T extends U ? never : T; 但是这里的索引签名使用的是 string 这样会删除所有的 属性

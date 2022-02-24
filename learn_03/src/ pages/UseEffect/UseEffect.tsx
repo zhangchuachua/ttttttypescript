@@ -1,4 +1,10 @@
-import React, { ReactElement, useState, useEffect, useRef, useReducer } from 'react';
+import React, {
+  ReactElement,
+  useState,
+  useEffect,
+  useRef,
+  useReducer,
+} from 'react';
 
 // 自定义hook
 function useInterval(callback: () => void, delay: number) {
@@ -12,7 +18,7 @@ function useInterval(callback: () => void, delay: number) {
   // Set up the interval.
   useEffect(() => {
     function tick() {
-      (savedCallback.current as (() => void))();
+      (savedCallback.current as () => void)();
     }
 
     if (delay !== null) {
@@ -24,28 +30,28 @@ function useInterval(callback: () => void, delay: number) {
 
 // 使用reducer的方式
 type StateType = {
-  count:number
-}
+  count: number;
+};
 
-type ActionType ={
-  type: 'increment' | 'decrement'
-}
+type ActionType = {
+  type: 'increment' | 'decrement';
+};
 
-const countReducer = (state :StateType, action: ActionType):StateType => {
+const countReducer = (state: StateType, action: ActionType): StateType => {
   switch (action.type) {
     case 'increment':
       return { count: state.count + 1 };
     case 'decrement':
       return { count: state.count - 1 };
-    default :
+    default:
       return state;
   }
-}
+};
 
-const UseEffect = ({initalCount=0}): ReactElement => {
+const UseEffect = ({ initalCount = 0 }): ReactElement => {
   // const [count, setCount] = useState(0)
   // 记住 应该这样使用useReducer  只需要将state与action的type定义好就是了
-  const [state, dispatch] = useReducer(countReducer, { count: initalCount })
+  const [state, dispatch] = useReducer(countReducer, { count: initalCount });
 
   // 这里的useEffect会在第一次的时候执行 执行的时候产生执行期上下文， 然后传入的参数相当于是一个闭包进行使用，闭包中获取到的count只能是未更新之前的count，所以这里就会一直
   // setCount(1)
@@ -98,10 +104,7 @@ const UseEffect = ({initalCount=0}): ReactElement => {
   //   }
   // }, [])
 
+  return <div>{state.count}</div>;
+};
 
-  return <div>
-    {state.count}
-  </div>
-}
-
-export default UseEffect
+export default UseEffect;

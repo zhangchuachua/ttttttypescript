@@ -5,12 +5,14 @@ export type Head<T extends any[]> = T[0]; // * T[0] 如果没有值的话 类型
 export type Head2<T extends any[]> = T['length'] extends 0 ? never : T[0];
 // *做法3  使用 First 取出第一个
 // !注意 可以不使用临时变量取出后续的元素，直接使用一个 ...any 就可以了
-export type Head3<T extends any[]> = T extends [infer First, ...any] ? First : never;
+export type Head3<T extends any[]> = T extends [infer First, ...any]
+  ? First
+  : never;
 
 // 测试用例
-type H0 = Head3<[]> // never
-type H1 = Head3<[1]> // 1
-type H2 = Head3<[3, 2]> // 3
-type H3 = Head<["a", "b", "c"]> // "a"
-type H4 = Head3<[undefined, "b", "c"]> // undefined
-type H5 = Head<[null, "b", "c"]> // null
+type H0 = Head3<[]>; // never
+type H1 = Head3<[1]>; // 1
+type H2 = Head3<[3, 2]>; // 3
+type H3 = Head<['a', 'b', 'c']>; // "a"
+type H4 = Head3<[undefined, 'b', 'c']>; // undefined
+type H5 = Head<[null, 'b', 'c']>; // null

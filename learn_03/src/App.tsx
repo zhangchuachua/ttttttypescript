@@ -1,7 +1,7 @@
 import React from 'react';
 // import UseMemo from "./ pages/UseMemo/UseMemo";
 import 'antd/dist/antd.css';
-import TSUseRef from "./ReactHook with TS/TSUseRef";
+import TSUseRef from './ReactHook with TS/TSUseRef';
 
 // import UseState from "./ pages/useState/useState";
 // import './App.css';
@@ -13,7 +13,7 @@ function App(): React.ReactElement {
       {/*<UseState />*/}
       {/*<UseEffect />*/}
       {/*<UseMemo/>*/}
-      <TSUseRef/>
+      <TSUseRef />
     </div>
   );
 }

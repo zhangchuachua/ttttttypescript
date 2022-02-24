@@ -15,18 +15,18 @@ type MutableError<T, Keys extends keyof T = keyof T> = {
 export type Mutable<T, Keys extends keyof T = keyof T> = {
   -readonly [index in Keys]: T[index];
   // TODO 这里是正确的 但是我有一个疑问，当这里的 Pick 替换为 { [P in Exclude<keyof T, Keys>]: T[P] } 后 反而再次错误了，但是这样与 Pick 源码几乎是一样的，可是还是没有保留 readonly 属性，期待以后进行解答
-} & Pick<T, Exclude<keyof T, Keys>>;// *注意 这里也可也直接替换为 Omit<T, Keys> 也是正确的
+} & Pick<T, Exclude<keyof T, Keys>>; // *注意 这里也可也直接替换为 Omit<T, Keys> 也是正确的
 
 // *看下面的例子就可以知道如何不修改属性原本的 readonly （可选属性应该也是适用的）
 // !不够完整
 type A = {
   [index in keyof Foo]: Foo[index];
-}
+};
 
 const a: A = {
   a: 1,
   b: '1',
-  c: true
+  c: true,
 };
 
 a.c = false; // a.c 不能修改
@@ -34,22 +34,22 @@ a.c = false; // a.c 不能修改
 // *不同点 in 'c' 而不是 keyof Foo
 type A2<T extends keyof Foo> = {
   [index in T]: Foo[index];
-}
+};
 
 const a2: A2<'c'> = {
-  c: false
+  c: false,
 };
-a2.c = true;// a2.c 可以修改
+a2.c = true; // a2.c 可以修改
 
 // *不同点  属性值的类型都手动设置为 boolean
 type A3 = {
   [index in keyof Foo]: boolean;
-}
+};
 
 const a3: A3 = {
   a: true,
   b: true,
-  c: true
+  c: true,
 };
 
 a3.c = false; // a3.c 不能修改
