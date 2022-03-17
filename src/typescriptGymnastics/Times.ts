@@ -10,10 +10,12 @@ export type Times<T extends number, R extends number> = T extends 0 ? 0 : R exte
 //* 注意这里
 type Test<T extends any[]> = keyof T;
 
-const T1: Times<3, 6> = 18
-const T2: Times<2, 5> = 10
-const T3: Times<3, 1> = 3
-const T4: Times<0, 1> = 0
+const T1: Times<3, 6> = 18;
+const T2: Times<2, 5> = 10;
+const T3: Times<3, 1> = 3;
+const T4: Times<0, 1> = 0;
+// const T5: Times<0.1, 10> = 1;
+
 let test1: Test<[1,2,3]> = 'length'; // *可以是属性
 test1 = 'push'; // *可以是方法名
 test1 = '0';
