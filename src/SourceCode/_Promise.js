@@ -154,36 +154,55 @@ class _Promise {
     return promise2;
   };
 
-  catch = (onRejected) => {
-    if(_typeof(onRejected) !== 'function') {
-      onRejected = (reason) => {
-        throw reason;
-      };
-    }
-    const p = new _Promise((resolve, reject) => {
-      if(this.status === Rejected) {
-        queueMicrotask(() => {
-          try {
-            const res = onRejected(this.reason);
-            resolvePromise(p, res, resolve, reject);
-          } catch(e) {
-            reject(e);
-          }
-        });
-      } else if(this.status === Pending) {
-        this.onRejectedList.push(() => {
-          queueMicrotask(() => {
-            try {
-              const res = onRejected(this.reason);
-              resolvePromise(p, res, resolve, reject);
-            } catch(e) {
-              reject(e);
-            }
-          });
-        });
-      }
+  // *其实这种写法，也是正确的，与 then 差不多
+  // catch = (onRejected) => {
+  //   if(_typeof(onRejected) !== 'function') {
+  //     onRejected = (reason) => {
+  //       throw reason;
+  //     };
+  //   }
+  //   const p = new _Promise((resolve, reject) => {
+  //     if(this.status === Rejected) {
+  //       queueMicrotask(() => {
+  //         try {
+  //           const res = onRejected(this.reason);
+  //           resolvePromise(p, res, resolve, reject);
+  //         } catch(e) {
+  //           reject(e);
+  //         }
+  //       });
+  //     } else if(this.status === Pending) {
+  //       this.onRejectedList.push(() => {
+  //         queueMicrotask(() => {
+  //           try {
+  //             const res = onRejected(this.reason);
+  //             resolvePromise(p, res, resolve, reject);
+  //           } catch(e) {
+  //             reject(e);
+  //           }
+  //         });
+  //       });
+  //     }
+  //   });
+  //   return p;
+  // };
+
+  // *finally 接收一个回调函数，且不会向回调函数中传递任何参数，这说明了 finally 应该与 Promise 的状态无关，不依赖于 Promise 的结果  finally 应该也是微任务 根据 阮一峰-ES6-Promise.finally 推断 https://wangdoc.com/es6/promise.html#promiseprototypefinally [finally 本质上是 then 方法的特例]
+  finally = (func) => {
+    // *因为 finally 是 then 的特例，所以可以这样实现
+    // *注意 这里依然需要返回，Promise 的 finally 后续依然可以接 then
+    return this.then((value) => {// !不能直接将 func 传入因为 onFulfilled 调用时会传入参数
+      func();
+      return value;// 注意这里的value要返回
+    }, (reason) => {// 同理
+      func();
+      throw reason;
     });
-    return p;
+  };
+
+  // *收到 finally 的启发 那么 catch 应该也是 then 的特殊形式
+  catch = (onRejected) => {
+    return this.then(null, onRejected);
   };
 }
 
