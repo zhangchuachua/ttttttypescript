@@ -10,53 +10,6 @@ const _typeof = (p) => {
   return Object.prototype.toString.call(p).slice(8, -1).toLowerCase();
 };
 
-// type Func = (...args: any) => any;
-// type Status = 'PENDING' | 'FULFILLED' | 'REJECTED';
-// const Pending: Status = 'PENDING';
-// const Fulfilled: Status = 'FULFILLED';
-// const Rejected: Status = 'REJECTED';
-//
-//
-// const _resolve = function(this: _Promise, value?: any) {
-//   if (this.status === Pending) {
-//     this.status = Fulfilled;
-//     this.value = value;
-//   }
-// };
-//
-// const _reject = function(this: _Promise, reason: any) {
-//   if (this.status === Pending) {
-//     this.status = Rejected;
-//     this.reason = reason;
-//   }
-// };
-//
-//
-// class _Promise {
-//   status: Status = Pending;
-//   value: any = null;
-//   reason: any = null;
-//
-//
-//   constructor(executor: (resolve?: typeof _resolve, reject?: typeof _reject) => any) {
-//     const self = this;
-//     executor(_resolve.bind(self), _reject.bind(self));
-//   }
-//
-//   then = (onFulfilled: Function, onRejected: Function) => {
-//
-//   }
-//
-//    catch = () => {
-//
-//    }
-// }
-//
-//
-// new _Promise((resolve, reject) => {
-//   resolve?.(1);
-// });
-
 const Pending = 'PENDING';
 const Fulfilled = 'FULFILLED';
 const Rejected = 'REJECTED';
@@ -77,8 +30,16 @@ const resolvePromise = (promise, x, resolve, reject) => {
   }
   // *当 onFulfilled 返回 _Promise 时就会触发这里，返回 _Promise 并不只是指显式的返回，比如 async () => {} 就会返回一个 Promise 与之类似
   if(x instanceof _Promise) {
+    // *x 是 Promise 时，例如 return fetch() 因为不知道 x 的状态，所以我们直接调用 x.then() 然后将 resolve 和 reject 传递过去 在 then 内部会改变状态，同时执行我们传入的 resolve reject 参数，这样就将 fetch 的状态和值同步到 当前的 Promise 中了， 而且这里 then 还返回了一个 Promise 不过我们不需要了，因为状态和值都同步了
     x.then(resolve, reject);
   } else {
+    /**
+     * 其他的值通通 resolve 也就是标记为 Fulfilled 这是为什么呢，这里的 x 是函数的返回值，不管是 onFulfilled 还是 onRejected 返回的值。 这个时候 x 的值总共可以分为三种情况
+     * !1. x 返回普通的值，也就是 比如对象啊，数组啊这些，那么这些就直接 resolve，resolve 之后新的 Promise 对象就会变成 Fulfilled 状态，这也就是为什么 catch 后的 then 可以获取到这个值的原因
+     * !2. 返回不确定的值，我能想到的不确定的值，就是等待异步返回的结果，也就是 Promise 注意 setTimeout 虽然是异步，但是它实在内部执行回调，不用等待返回值，而且 setTimeout 的返回值在 node 是一个对象，在浏览器就是 timeoutId
+     * !3. 返回错误，其实没有返回错误，只有抛出错误，抛出错误就已经在上一层中被 catch 到了。就算返回错误 return new Error() 其实也算是普通值了，直接 resolve （注意：在浏览器试的时候发现 new Error() 只能被分配给 const）
+     * *所以这里安心使用 resolve 是没有问题的
+     * */
     resolve(x);
   }
 };
@@ -129,6 +90,16 @@ class _Promise {
   };
 
   then = (onFulfilled, onRejected) => {
+    // *这里的处理是为了应对 then 中不传参数，或者传入不是函数的情况，当这种情况，不会报错，而是将值继续进行传递 所以Promise.then().then().then(value => console.log(value))  最后一个 then 还是能够获得 value
+    if(_typeof(onFulfilled) !== 'function') {
+      onFulfilled = value => value;
+    }
+    // *这里有所不同，这里需要 throw 因为是错误，需要走 reject 将状态修改为 Rejected
+    if(_typeof(onRejected) !== 'function') {
+      onRejected = reason => {
+        throw reason;
+      };
+    }
     // const self = this;
     const promise2 = new _Promise((resolve, reject) => {
       // *因为 箭头函数 this 指向函数定义时的所在的对象，所以这里 self === this 为 true 不会因为后面执行而修改 this 指向
@@ -182,25 +153,38 @@ class _Promise {
     });
     return promise2;
   };
+
+  catch = (onRejected) => {
+    if(_typeof(onRejected) !== 'function') {
+      onRejected = (reason) => {
+        throw reason;
+      };
+    }
+    const p = new _Promise((resolve, reject) => {
+      if(this.status === Rejected) {
+        queueMicrotask(() => {
+          try {
+            const res = onRejected(this.reason);
+            resolvePromise(p, res, resolve, reject);
+          } catch(e) {
+            reject(e);
+          }
+        });
+      } else if(this.status === Pending) {
+        this.onRejectedList.push(() => {
+          queueMicrotask(() => {
+            try {
+              const res = onRejected(this.reason);
+              resolvePromise(p, res, resolve, reject);
+            } catch(e) {
+              reject(e);
+            }
+          });
+        });
+      }
+    });
+    return p;
+  };
 }
 
-const promise1 = new _Promise((resolve) => {
-  setTimeout(() => {
-    resolve(1);
-  }, 1000);
-});
-
-const xx = promise1.then((value) => {
-  console.log(value, 1, '链式');
-  return 'okok';
-}).then((data) => {
-  console.log(data);
-});
-
-promise1.then((value) => {
-  console.log(value, 2);
-});
-
-promise1.then((value) => {
-  console.log(value, 3);
-});
+module.exports = _Promise;
