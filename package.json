@@ -1,6 +1,11 @@
 {
   "name": "typescript-vite",
   "version": "0.0.0",
+  "workspaces": {
+    "src/SourceCode": [
+      "_Promise/*"
+    ]
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

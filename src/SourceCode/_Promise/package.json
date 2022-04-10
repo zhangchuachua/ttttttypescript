@@ -1,0 +1,15 @@
+{
+  "name": "_promise",
+  "version": "1.0.0",
+  "description": "",
+  "main": "_Promise.js",
+  "scripts": {
+    "test": "promises-aplus-tests _Promise.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "promises-aplus-tests": "^2.1.2"
+  }
+}
