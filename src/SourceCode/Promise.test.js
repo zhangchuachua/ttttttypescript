@@ -1,4 +1,7 @@
 const _Promise = require('./_Promise');
+const _typeof = (p) => {
+  return Object.prototype.toString.call(p).slice(8, -1).toLowerCase();
+};
 
 // new Promise((r,s) => {
 //   r(1)
@@ -27,3 +30,33 @@ const _Promise = require('./_Promise');
 //   console.log(123);
 //   return 'finally'
 // }).then(value => {console.log(value);});
+
+_Promise.all([
+  new _Promise((r, s) => {
+    r(1);
+  }),
+  new _Promise((r, s) => {
+    r(2);
+  }),
+  new _Promise((r, s) => {
+    s(3);
+  }),
+]).then(value => {
+  console.log(value);
+}).catch(value => {
+  console.log(value);
+});
+
+// new Promise((r, s) => {
+//   s(123)
+// })
+
+// console.log(_typeof(Promise));
+
+Promise.all([
+  new Error('fuck'),
+]).then((value) => {
+  console.log(value, 'then');
+}).catch(err => {
+  console.log(err, 'catch');
+});

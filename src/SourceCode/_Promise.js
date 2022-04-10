@@ -204,6 +204,50 @@ class _Promise {
   catch = (onRejected) => {
     return this.then(null, onRejected);
   };
+
+  // *resolve 和 reject 比较简单，就是直接改变 Promise 的状态就行
+  static reject(reason) {
+    return new _Promise((resolve, reject) => {
+      reject(reason);
+    });
+  }
+
+  static resolve(value) {
+    return new _Promise((resolve) => {
+      resolve(value);
+    });
+  }
+
+  /**
+   * @desc 经过测试可得 Promise.all() 可以直接传入值 不像 Promise() 的值必须是一个函数
+   * @desc 经过测试 Promise.all() 传入 Error() 时依然经过 then 而不是 catch
+   * @param values {(_Promise|any)[]}
+   * */
+  static all(values) {
+    // *实现的思路也比较简单，但是不确定是否正确
+    // *使用一个临时数组存储多个 Promise 的结果值
+    const tempArr = [];
+    // *新建一个 Promise 记录所有的 value
+    const p = new _Promise((resolve, reject) => {
+      values.forEach((item, index) => {
+        // 判断类型，如果是 _Promise 就需要等待结果 如果是一个普通的值，就直接记为 resolve
+        if(!item instanceof _Promise) tempArr[index] = item;
+        item.then((value) => {
+          // *这里我没有使用 push 因为传入的数组，与结果之间是一一对应的， 但是使用 push 应该也是一样的结果，因为 onFulfilled 会放到 微队列里面进行，根据队列先入先出的性质顺序应该也不会发生改变。
+          tempArr[index] = value;
+        }, (err) => {
+          // *当有一个 reject 了 直接让当前 p 变成 rejected 状态。
+          reject(err);
+        });
+      });
+      // 如果都进行成功了,那么这使用 resolvePromise 将 tempArr 放到 p 的 value 中去
+      queueMicrotask(() => {
+        resolvePromise(p, tempArr, resolve, reject);
+      });
+    });
+    // 返回 p
+    return p;
+  }
 }
 
 module.exports = _Promise;
