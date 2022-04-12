@@ -6,7 +6,6 @@
  * https://juejin.cn/post/6945319439772434469#heading-10 手写 Promise 还要 eventLoop 图例
  * https://danlevy.net/javascript-promises-quiz/ promise 运行题目
  * */
-const {type} = require("os");
 
 const _typeof = (p) => {
   return Object.prototype.toString.call(p).slice(8, -1).toLowerCase();

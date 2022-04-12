@@ -31,21 +31,21 @@ const _typeof = (p) => {
 //   return 'finally'
 // }).then(value => {console.log(value);});
 
-_Promise.all([
-  new _Promise((r, s) => {
-    r(1);
-  }),
-  new _Promise((r, s) => {
-    r(2);
-  }),
-  new _Promise((r, s) => {
-    s(3);
-  }),
-]).then(value => {
-  console.log(value);
-}).catch(value => {
-  console.log(value);
-});
+// _Promise.all([
+//   new _Promise((r, s) => {
+//     r(1);
+//   }),
+//   new _Promise((r, s) => {
+//     r(2);
+//   }),
+//   new _Promise((r, s) => {
+//     s(3);
+//   }),
+// ]).then(value => {
+//   console.log(value);
+// }).catch(value => {
+//   console.log(value);
+// });
 
 // new Promise((r, s) => {
 //   s(123)
@@ -53,10 +53,49 @@ _Promise.all([
 
 // console.log(_typeof(Promise));
 
-Promise.all([
-  new Error('fuck'),
-]).then((value) => {
-  console.log(value, 'then');
-}).catch(err => {
-  console.log(err, 'catch');
-});
+// Promise.all([
+//   new Error('fuck'),
+// ]).then((value) => {
+//   console.log(value, 'then');
+// }).catch(err => {
+//   console.log(err, 'catch');
+// });
+
+// _Promise.resolve().then(() => {
+//   console.log(0)
+//   return _Promise.resolve(4);
+// }).then((res) => {
+//   console.log(res)
+// })
+//
+// _Promise.resolve().then(() => {
+//   console.log(1);
+// }).then(() => {
+//   console.log(2);
+// }).then(() => {
+//   console.log(3);
+// }).then(() => {
+//   console.log(5);
+// }).then(() =>{
+//   console.log(6);
+// })
+
+
+Promise.resolve().then(() => {
+  console.log(0)
+  return Promise.resolve(4);
+}).then((res) => {
+  console.log(res)
+})
+
+Promise.resolve().then(() => {
+  console.log(1);
+}).then(() => {
+  console.log(2);
+}).then(() => {
+  console.log(3);
+}).then(() => {
+  console.log(5);
+}).then(() =>{
+  console.log(6);
+})
