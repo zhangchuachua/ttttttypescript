@@ -70,23 +70,23 @@ const resolvePromise = (promise, x, resolve, reject) => {
          * */
         then.call(
           x,
-          y => {
+          (y) => {
             if (called) return;
             called = true;
             resolvePromise(promise, y, resolve, reject);
           },
-          r => {
+          (r) => {
             if (called) return;
             called = true;
-            reject(r)
-          })
-      } catch(e) {
+            reject(r);
+          }
+        );
+      } catch (e) {
         // Promise A+ 也说了，如果发生了错误，但是 called 为 true 那么则忽略，否则就进行 reject
-        if(called) return;
+        if (called) return;
         return reject(e);
       }
-    }
-    else {
+    } else {
       // *then 不是一个函数，就直接 resolve(x)
       resolve(x);
     }
@@ -106,7 +106,8 @@ class _Promise {
   constructor(executor) {
     if (_typeof(executor) !== 'function') {
       throw new TypeError(
-        'Promise resolver ' + executor + ' is not a function');
+        'Promise resolver ' + executor + ' is not a function'
+      );
     }
     try {
       executor(this._resolve, this._reject);
@@ -143,13 +144,14 @@ class _Promise {
 
   // *注意：这里不能使用箭头函数，因为 resolvePromise 函数中会有使用 call 改变 this 的情况，但是箭头函数的 this 不能被 call 改变
   then(onFulfilled, onRejected) {
+    console.log('then')
     // *这里的处理是为了应对 then 中不传参数，或者传入不是函数的情况，当这种情况，不会报错，而是将值继续进行传递 所以Promise.then().then().then(value => console.log(value))  最后一个 then 还是能够获得 value
     if (_typeof(onFulfilled) !== 'function') {
-      onFulfilled = value => value;
+      onFulfilled = (value) => value;
     }
     // *这里有所不同，这里需要 throw 因为是错误，需要走 reject 将状态修改为 Rejected
     if (_typeof(onRejected) !== 'function') {
-      onRejected = reason => {
+      onRejected = (reason) => {
         throw reason;
       };
     }
@@ -184,7 +186,7 @@ class _Promise {
           // 同样的也是放到微队列中
           queueMicrotask(() => {
             try {
-              const res = onFulfilled(this.value);// *注意在这里，就可以直接调用 onFulfilled 函数了，因为 _resolve 会判断 status === Resolved ，第二个是，此时 this.value 已经准备好了，所以完全没有问题
+              const res = onFulfilled(this.value); // *注意在这里，就可以直接调用 onFulfilled 函数了，因为 _resolve 会判断 status === Resolved ，第二个是，此时 this.value 已经准备好了，所以完全没有问题
               resolvePromise(promise2, res, resolve, reject);
             } catch (e) {
               reject(e);
@@ -205,7 +207,7 @@ class _Promise {
       }
     });
     return promise2;
-  };
+  }
 
   // *其实这种写法，也是正确的，与 then 差不多
   // catch = (onRejected) => {
@@ -244,13 +246,18 @@ class _Promise {
   finally = (func) => {
     // *因为 finally 是 then 的特例，所以可以这样实现
     // *注意 这里依然需要返回，Promise 的 finally 后续依然可以接 then
-    return this.then((value) => {// !不能直接将 func 传入因为 onFulfilled 调用时会传入参数
-      func();
-      return value;// 注意这里的value要返回
-    }, (reason) => {// 同理
-      func();
-      throw reason;
-    });
+    return this.then(
+      (value) => {
+        // !不能直接将 func 传入因为 onFulfilled 调用时会传入参数
+        func();
+        return value; // 注意这里的value要返回
+      },
+      (reason) => {
+        // 同理
+        func();
+        throw reason;
+      }
+    );
   };
 
   // *收到 finally 的启发 那么 catch 应该也是 then 的特殊形式
@@ -265,13 +272,23 @@ class _Promise {
     });
   }
 
+  // *根据 es6 需要判断 value 的类型
+  /**
+   * 1. value 是一个 Promise 时，那么应该原封不动进行返回.
+   * 2. value 是一个带有 then 方法的对象时，会先将 value 转换成 Promise 然后立即执行 value.then
+   * 3. value 不是一个带有 then 方法的对象，或者根本不是一个对象时，直接将其转换为 Promise
+   * 4. 当没有传入value时，直接返回 resolved 状态的 Promise 其实这一个可以与 第三个结合
+   * */
   static resolve(value) {
+    if (value instanceof _Promise) return value;
+    if(_typeof(value?.then) === 'function') return new Promise(value.then);
     return new _Promise((resolve) => {
       resolve(value);
     });
   }
 
   /**
+   * 目前的做法不一定对
    * @desc 经过测试可得 Promise.all() 可以直接传入值 不像 Promise() 的值必须是一个函数
    * @desc 经过测试 Promise.all() 传入 Error() 时依然经过 then 而不是 catch
    * @param values {(_Promise|any)[]}
@@ -285,15 +302,18 @@ class _Promise {
       values.forEach((item, index) => {
         // 判断类型，如果是 _Promise 就需要等待结果 如果是一个普通的值，就直接记为 resolve
         if (!item instanceof _Promise) tempArr[index] = item;
-        item.then((value) => {
-          // *这里我没有使用 push 因为传入的数组，与结果之间是一一对应的， 但是使用 push 应该也是一样的结果，因为 onFulfilled 会放到 微队列里面进行，根据队列先入先出的性质顺序应该也不会发生改变。
-          tempArr[index] = value;
-        }, (err) => {
-          // *当有一个 reject 了 直接让当前 p 变成 rejected 状态。
-          reject(err);
-        });
+        item.then(
+          (value) => {
+            // *这里我没有使用 push 因为传入的数组，与结果之间是一一对应的， 但是使用 push 应该也是一样的结果，因为 onFulfilled 会放到 微队列里面进行，根据队列先入先出的性质顺序应该也不会发生改变。
+            tempArr[index] = value;
+          },
+          (err) => {
+            // *当有一个 reject 了 直接让当前 p 变成 rejected 状态。
+            reject(err);
+          }
+        );
       });
-      // 如果都进行成功了,那么这使用 resolvePromise 将 tempArr 放到 p 的 value 中去
+      // *根据队列先进先出的性质，这里对话一个入队，所以应该是最后执行。如果都进行成功了,那么这使用 resolvePromise 将 tempArr 放到 p 的 value 中去
       queueMicrotask(() => {
         resolvePromise(p, tempArr, resolve, reject);
       });
@@ -311,6 +331,6 @@ _Promise.deferred = function () {
   });
 
   return result;
-}
+};
 
 module.exports = _Promise;
