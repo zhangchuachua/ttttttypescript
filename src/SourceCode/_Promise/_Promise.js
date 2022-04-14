@@ -5,6 +5,10 @@
  * https://juejin.cn/post/6966860151311564836 javascript 中 class 的 this 指向
  * https://juejin.cn/post/6945319439772434469#heading-10 手写 Promise 还要 eventLoop 图例
  * https://danlevy.net/javascript-promises-quiz/ promise 运行题目
+ *
+ * !关于 Promise 那道面试题的相关链接
+ * https://juejin.cn/post/6953452438300917790 掘金
+ * https://www.zhihu.com/question/453677175 知乎 有对于 V8 源码的解读，也有一步一步从代码分析，也有总结发言
  * */
 
 const _typeof = (p) => {
@@ -68,19 +72,23 @@ const resolvePromise = (promise, x, resolve, reject) => {
          * 2. 当 rejectPromise 被调用时，就使用参数 r 进行 reject
          * 3. 当 resolvePromise 和 rejectPromise 都被调用时，或者两者都被调用多次时，仅进行第一个调用， 这就是为什么需要声明一个 called 用来存储是否调用过。
          * */
-        then.call(
-          x,
-          (y) => {
-            if (called) return;
-            called = true;
-            resolvePromise(promise, y, resolve, reject);
-          },
-          (r) => {
-            if (called) return;
-            called = true;
-            reject(r);
-          }
-        );
+
+        // !注意：要想达到 Promise 原生的打印效果，必须将 then 的执行放到 微队列 中去，至于为什么，这是 ECMA 标准中规定的，暂时还不清楚。
+        queueMicrotask(() => {
+          then.call(
+            x,
+            (y) => {
+              if (called) return;
+              called = true;
+              resolvePromise(promise, y, resolve, reject);
+            },
+            (r) => {
+              if (called) return;
+              called = true;
+              reject(r);
+            }
+          );
+        });
       } catch (e) {
         // Promise A+ 也说了，如果发生了错误，但是 called 为 true 那么则忽略，否则就进行 reject
         if (called) return;
@@ -144,7 +152,8 @@ class _Promise {
 
   // *注意：这里不能使用箭头函数，因为 resolvePromise 函数中会有使用 call 改变 this 的情况，但是箭头函数的 this 不能被 call 改变
   then(onFulfilled, onRejected) {
-    console.log('then')
+    // console.log('then');// *通过打印可以知道 then 的初始化都是同步的
+
     // *这里的处理是为了应对 then 中不传参数，或者传入不是函数的情况，当这种情况，不会报错，而是将值继续进行传递 所以Promise.then().then().then(value => console.log(value))  最后一个 then 还是能够获得 value
     if (_typeof(onFulfilled) !== 'function') {
       onFulfilled = (value) => value;
@@ -281,7 +290,7 @@ class _Promise {
    * */
   static resolve(value) {
     if (value instanceof _Promise) return value;
-    if(_typeof(value?.then) === 'function') return new Promise(value.then);
+    if (_typeof(value?.then) === 'function') return new Promise(value.then);
     return new _Promise((resolve) => {
       resolve(value);
     });

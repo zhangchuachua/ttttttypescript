@@ -85,6 +85,7 @@ const _typeof = (p) => {
 
 // *输出 0 1 2 4 3 5 6
 /** 解析
+ * !注意：这里手写的 _Promise 是完全可以通过 Promise Aplus 测试的，也就是说，是完全符合标准的，至于为什么与 Promise 输出不一样，是 各种实现对 Promise 进行的优化，具体的看下面的解析
  * !注意：根据在 then 里面进行打印可以知道，所有的 then 的声明都是同步代码。 也就是说 所有的 then 都是直接执行了
  *
  * !1. 执行同步代码: 这里执行的是所有的 then 但是入队的只有两个，第一个是 log 0 的函数，第二个是 log 1 的函数，因为只有在状态 !== Pending 的情况下才会将操作进行入队，但是其他的 then 状态都是 Pending 所以都将操作 push 到了 onFulfilledList 中了
@@ -95,27 +96,49 @@ const _typeof = (p) => {
  * !6. 出队 log res 打印 4
  * !7. 然后依次 log 3, log 5 log 6
  * */
-_Promise.resolve().then(() => {
-  console.log(0)
-  return _Promise.resolve(4);
-}).then((res) => {
-  console.log(res)
-})
 
-_Promise.resolve().then(() => {
-  console.log(1);
-}).then(() => {
-  console.log(2);
-}).then(() => {
-  console.log(3);
-}).then(() => {
-  console.log(5);
-}).then(() =>{
-  console.log(6);
-})
+_Promise
+  .resolve()
+  .then(() => {
+    console.log(0);
+    return _Promise.resolve(4);
+  })
+  .then((res) => {
+    console.log(res);
+  });
 
-/**
+_Promise
+  .resolve()
+  .then(() => {
+    console.log(1);
+  })
+  .then(() => {
+    console.log(2);
+  })
+  .then(() => {
+    console.log(3);
+  })
+  .then(() => {
+    console.log(5);
+  })
+  .then(() => {
+    console.log(6);
+  });
+
+/** 解析 v8 源码的实现与我们的实现有些许不同
  *
+ * *https://juejin.cn/post/6953452438300917790 掘金
+ * *https://www.zhihu.com/question/453677175 知乎 有对于 V8 源码的解读，也有一步一步从代码分析，也有总结发言
+ *
+ * !1. 执行同步代码，将所有的 then 初始化完毕，入队的只有 log 0 和 log 1
+ * !2. 出队 log 0 同时执行 return Promise.resolve(4); 注意不同在这里：这里返回了一个 Promise 我们的做法是直接调用 Promise 的 then(onFulfilled, onRejected)，然后 then 再将 onFulfilled 放入微队列；但是 v8 源码中，只要返回的值是 thenable 的也就是有 then 函数的，就会直接放到微队列去执行这个 then 也就是说，手写的代码是直接执行了这个 then 但是 v8 源码中是将 then 包装成一个 微任务区执行
+ * !3. 出队 log 1 并且入队 log 2
+ * !4. 出队包装 then 的任务，然后执行，也就相当于执行 then 再将 onFulfilled 入队
+ * !5. log 2 入队 log 3
+ * !6. 出队 onFulfilled 执行，得到 value = 4 然后将 log res 入队
+ * !7. log 4 然后 log 5 log 6
+ *
+ * !所以要想让手写的代码达到原生 Promise 的输出就必须要在 执行 then 之前，将 then 放到微队列里面去
  */
 // *这里的输出为 0 1 2 3 4 5 6
 // Promise.resolve().then(() => {
