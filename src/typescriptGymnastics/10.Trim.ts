@@ -2,7 +2,7 @@
 type TrimRight<V extends string> = V extends ` ${infer R}` ? TrimRight<R> : V;
 type TrimLeft<V extends string> = V extends `${infer R} ` ? TrimLeft<R> : V;
 
-type Trim<V extends string> = TrimLeft<TrimRight<V>>;
+export type Trim<V extends string> = TrimLeft<TrimRight<V>>;
 
 // 测试用例
 const a: Trim<' semlinker '> = 'semlinker';

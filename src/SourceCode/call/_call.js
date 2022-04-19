@@ -1,11 +1,6 @@
 // !不能是箭头函数，箭头函数没有 this 也就无法获取当前正在调用的函数，当前的 this 就是当前被调用的函数
 // TODO 其实第一步应该判断 当前被调用的函数是否可以执行 isCallable 但是目前不知道如何判断，但是有一个库：https://github.com/inspect-js/is-callable/blob/main/index.js 后续可以看一下
-function _call<T, A extends any[], R>(this: (thisArg: T) => R, thisArg: T): R;
-function _call<T, A extends any[], R>(
-  this: (thisArg: T, ...args: A) => R,
-  thisArg: T,
-  ...args: A
-): R {
+function _call(thisArg, ...args) {
   let _this;
   if (thisArg === null || thisArg === undefined) {
     _this = typeof window === 'undefined' ? global : window;
@@ -26,7 +21,4 @@ function _call<T, A extends any[], R>(
   return res;
 }
 
-// @ts-ignore
-Function.prototype._call = _call;
-
-export default _call;
+module.exports = _call;
