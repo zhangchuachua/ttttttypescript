@@ -9,5 +9,3 @@
  * 7. 匿名函数: 浏览器下匿名函数 this 指向 window，但是在 node 下，使用 setTimeout 进行测试，无论是否严格模式，this都指向 Timeout
  * */
 // *https://juejin.cn/post/6844903496450310157 讲述了 call 执行过程，apply 的执行过程，比较两者之间的性能
-
-import '_call'
