@@ -9,7 +9,7 @@ import './style.css';
 // import './geekTimeTS/5.class';
 // import './geekTimeTS/6.class-interface';
 // import './geekTimeTS/7.generic';
-import './SourceCode/call'
+import './SourceCode/_new/new.test'
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 

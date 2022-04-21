@@ -1,6 +1,6 @@
 function _apply(thisArg, args) {
   // *因为 _apply 是 _call 的语法糖，所以不需要处理 thisArg 在 _call 内部会进行处理
-  if (args === undefined || args === null) return this._call(thisArg, []);
+  if (args === undefined || args === null) return this._call(thisArg);
   // *排除原始类型
   if (typeof args !== 'object')
     throw new TypeError('CreateListFromArrayLike called on non-object');
@@ -17,10 +17,12 @@ function _apply(thisArg, args) {
 
 // *在网上可以搜索到如何判断伪数组，而且不同库也有不同的实现
 function isArrayLike(obj) {
-  return typeof obj?.length === 'number' &&
-      obj.length >= 0 &&
-      Math.floor(obj.length) === obj.length && // length 不是小数
-      isFinite(obj.length); // length 是有限的
+  return (
+    typeof obj?.length === 'number' &&
+    obj.length >= 0 &&
+    Math.floor(obj.length) === obj.length && // length 不是小数
+    isFinite(obj.length)
+  ); // length 是有限的
 }
 
 module.exports = _apply;
