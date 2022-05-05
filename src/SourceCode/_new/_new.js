@@ -5,7 +5,6 @@
  *  *3. 使用第一步创建的空对象作为构造函数的上下文，并且执行构造函数，传入参数
  *  *4. 检查构造函数返回值，如果构造函数返回值是一个对象，那么就返回这个对象，不然就返回第一步创建的对象。
  * */
-import num2Chinese from "../../typescriptGymnastics/num2Chinese";
 
 // *es6 写法
 function _new(Con, ...args) {
