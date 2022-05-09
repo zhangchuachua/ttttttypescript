@@ -13,7 +13,7 @@ function _call(thisArg, ...args) {
   const sym = Symbol('secret');
   _this[sym] = this;
   // *在这里进行调用，这里就把函数放到了对象中去调用，所以这个时候的 this 指向该对象，也就是 _this
-  // *但是因为对 _this 新增了一个 sym 属性，所以如果在被调用函数中打印 this 是可以看到这个 sym 属性的，因为被调用时还没有被删除。但是官方的 call 函数中打印并没有看到中间属性。 看来使用了更高级的做法
+  // *但是因为对 _this 新增了一个 sym 属性，所以如果在被调用函数中打印 this 是可以看到这个 sym 属性的，因为被调用时还没有被删除。但是官方的 _call&_apply&_bind 函数中打印并没有看到中间属性。 看来使用了更高级的做法
   const res = _this[sym](...args);
   // 这里删除这个属性
   delete _this[sym];
