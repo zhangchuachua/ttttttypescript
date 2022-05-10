@@ -20,7 +20,7 @@
 
 ### 4. curry
 
-[curry](curry/index.js)
+[curry](FP-函数式编程/curry/index.js)
 
 ### 纯函数
 

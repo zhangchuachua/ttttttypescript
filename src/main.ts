@@ -9,7 +9,9 @@ import './style.css';
 // import './geekTimeTS/5.class';
 // import './geekTimeTS/6.class-interface';
 // import './geekTimeTS/7.generic';
-import './SourceCode/_call&_apply&_bind/_bind'
+// import './SourceCode/_call&_apply&_bind/_bind'
+// import './SourceCode/FP-函数式编程/compose/index'
+import './SourceCode/FP-函数式编程/curry/index'
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 
