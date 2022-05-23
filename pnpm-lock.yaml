@@ -1,4 +1,4 @@
-lockfileVersion: 5.3
+lockfileVersion: 5.4
 
 importers:
 
@@ -10,7 +10,7 @@ importers:
       typescript: ^4.5.2
       vite: ^2.7.1
     dependencies:
-      ts-node: 10.7.0_00a824dde0a4c6e129cc4fa7dfb25416
+      ts-node: 10.7.0_acucjxpautdockomj6t57msucy
     devDependencies:
       '@types/node': 17.0.23
       prettier: registry.npmmirror.com/prettier/2.5.1
@@ -98,10 +98,16 @@ packages:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
     dev: false
 
-  /debug/2.2.0:
+  /debug/2.2.0_supports-color@1.2.0:
     resolution: {integrity: sha1-+HBX6ZWxofauaklgZkE3vFbwOdo=}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
     dependencies:
       ms: 0.7.1
+      supports-color: 1.2.0
     dev: false
 
   /define-properties/1.1.3:
@@ -561,7 +567,7 @@ packages:
     hasBin: true
     dependencies:
       commander: 2.3.0
-      debug: 2.2.0
+      debug: 2.2.0_supports-color@1.2.0
       diff: 1.4.0
       escape-string-regexp: 1.0.2
       glob: 3.2.11
@@ -703,7 +709,7 @@ packages:
     deprecated: to-iso-string has been deprecated, use @segment/to-iso-string instead.
     dev: false
 
-  /ts-node/10.7.0_00a824dde0a4c6e129cc4fa7dfb25416:
+  /ts-node/10.7.0_acucjxpautdockomj6t57msucy:
     resolution: {integrity: sha512-TbIGS4xgJoX2i3do417KSaep1uRAW/Lu+WAL2doDHC0D6ummjirVOXU5/7aiZotbQ5p1Zp9tP7U6cYhA0O7M8A==}
     hasBin: true
     peerDependencies:
