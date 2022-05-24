@@ -577,7 +577,7 @@ async function name() {
 name();
 ```
 
-当 `await` 后面是原始类型时，会将原始类型包装成 `Promise.resolve(?) `
+当 `await` 后面是原始类型时，会将原始类型包装成 `Promise.resolve(?)`
 
 为什么会记录这条呢？一开始读到这句话，一直以为是将 `await 123` 的返回值包装成 `Promise` 对象，但是后来才想到，是先将 `123` 包装成 `Promise.resolve(123)`
 然后使用 `await Promise.resolve(123)` 直接返回 `123`
@@ -618,17 +618,20 @@ async function name2() {
 /***
  * 为什么上面的 console.log(c) 不会执行，下面的 console.log(c) 执行了呢
  * !await 对于 thenable 对象，也会将其视为 Promise 对象处理。
- * !Promise 对象中对于 thenable 对象，其实很简单，就是直接将 then 方法拿出来，并且进行执行。这一段在 resolveProsmie 函数中
+ * !Promise 对象中对于 thenable 对象，其实很简单，就是直接将 then 方法拿出来，并且进行执行。这一段在 resolvePromise 函数中
  * !但是要注意一个点，我们平常使用的 Promise.resolve(123).then(()=>{},()=>{}) 这里的 then 是在执行，然后传入了两个方法也就是 onFulfilled, onRejected 也就是说，我们只是传入回调，对 then 内部的实现并不清楚，传入的参数如果有返回值，那么也是 onFulfilled 的返回值，而不是 then 函数的返回值。
  * !所以说，上面 then 执行后的返回值，我们根本不在乎，我们在乎的是 onFulfilled, onRejected 的执行。因为 onFulfilled, onRejected 的执行可以改变状态。
  *
  *
  * !但是再注意,这只是一个 thenable 对象,并不是 Promise 对象,应该没有状态可言，而且根据 Promise 源码，如果没有经过 then 那么就根本不会进入 resolvePromise 函数，就更别说针对 thenable 对象进行处理了。
  * !我更倾向于， await 将 thenable 对象也也包装成了一个 Promise.resolve(thenable) 因为查看手写的源码可以发现，Promise.resolve() 传入一个 thenable 时，等于 new Promise(thenable.then) 。这样解释目前来看更解释得通。
+ * 
+ * !2022-05-25 补充：await 其实并没对返回值: value 做任何处理，直接将 value 放到了 Promise.resolve(value) 因为 Promise.resolve 自己会在内部进行特殊处理，比如如果 value 是 Promise，那么直接返回该 Promise; 如果是一个 thenable 那么返回 new Promise(thenable.then);
  */
 ```
 
 `await` 可以直接获得其 `value` 或抛出其 `reason`
+
 
 ```js
 async function name() {
@@ -652,5 +655,114 @@ reject_test()
 // *这里与上面也是类似的，明明没有抛出错误，但是外部依然可以捕获错误。
 // *await 直接获取了状态为 rejected 的 Promise 的 reason
 
-// *在 async-await 源码中应该有实现
+// !2022-05-25 补充：await 将会自动返回 vlaue 值或抛出 reason，具体的实现看 async-await/index.js
+```
+
+添加一个小知识，`forEach` 的函数是同时执行的，如下所示：
+
+```js
+async  function name(time: number) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(time);
+    }, time)
+  })
+}
+
+let c = [name, name, name];
+
+c.forEach(async (p) => {
+  const time = await p(1000);
+  console.log(time, 'done');// *这里三个函数会同时打印 1000 done 说明这三个函数是同时执行的
+})
+
+async function xx () {
+  for(let i of c) {
+    const time = await i(1000);
+    console.log(time, 'done');// *这里会按照顺序输出 1000 done
+  }
+}
+
+xx();
+```
+
+那么也就可以推论出数组的大部分方法应该都是同时执行的，但是 `reduce` 明显不是，因为它的值依赖于上个函数执行的结果
+
+#### async 函数可以保留运行堆栈
+
+这个其实是 Generator 函数的特性，例如：
+
+```js
+const a = () => {
+  b().then(() => c());
+};
+a();
+```
+
+上面代码中，`a` 函数内部调用了一个异步任务 `b`。执行 `a` 并且运行到 `b` 时，`a()` 不会中断，而是继续执行，但是等到 `b()` 执行完成时，`a()` 可能早就执行完了，`b(`) 所在的上下文环境已经消失了，当 `b()` 或 `c()` 报错，错误堆栈中将不包括 `a()`.
+
+```js
+const a = async () => {
+  await b();
+  c();
+};
+a();
+```
+
+将 `a` 改造成 `async` 函数，当 `a()` 执行遇到 `await b();` 时，将会暂停 `a()` 上下文环境都保存着。一旦 `b()` 或 `c()` 报错，错误堆栈将包括 `a()`
+
+### 源码
+
+看文章，大家都没有具体实现 async-await 都只是写了一个 Generator 函数的执行器， 那么这里就先完成执行器
+
+```js
+// *这里就是 阮一峰-ES6教程 中的实现：https://wangdoc.com/es6/async.html#async-%E5%87%BD%E6%95%B0%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86
+function spawn(genF) {
+// 返回一个 Promise
+return new Promise((resolve, reject) => {
+// 首先获取遍历器对象
+const gen = genF();
+
+    // 自动执行器
+    function step(nextF) {
+      let next;
+
+      try {
+        // *获取函数执行的返回值，一般来说是执行遍历器的返回值 type: { value: any, done: boolean }
+        next = nextF()
+      } catch (e) {
+        reject(e);
+      }
+
+      // *如果 done 为 true 就 resolve
+      if (next.done) {
+        // *注意 此时的 next.value 是 Generator 函数的 return 值，如果没有 return 那么就是 undefined
+        return resolve(next.value);
+      }
+
+      // !疑问2：为什么这里直接使用了 Promise.resolve，next.value 可能是任何值，比如 Promise，原始类型，thenable 对象，对于 原始类型 直接 resolve 可以接受，为什么对于 Promise，thenable 对象也是这样处理
+      // !原因很简单，Promise.resolve 中已经包含了对 Promise, thenable 对象的特殊处理，如果参数是 Promise 那么就会直接返回该 Promise 并不会将其状态改变为 fulfilled; 对于 thenable 对象，将会这样处理 new Promise(thenable.then) 。
+      Promise.resolve(next.value).then(function (v) {
+        // *这里直到 Promise 状态为 fulfilled 才会执行
+        step(function () {
+          return gen.next(v);
+        });
+      }, function (e) {
+        // *这里直到  Promise 状态为 rejected 才会执行
+        step(function () {
+          return gen.throw(e);
+        });
+      });
+
+
+    }
+
+    // !疑问1 为什么这里需要传入一个函数，而不是直接传入 value 然后在 step 内部执行 gen.next(value)
+    // !因为内部不只有 next 还有可能会 throw ，所以需要传入函数进行控制
+    step(function () {
+      return gen.next(undefined);
+    });
+})
+
+}
 ```

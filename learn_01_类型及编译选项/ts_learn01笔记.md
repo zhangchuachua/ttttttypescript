@@ -12,7 +12,7 @@
 
 4. 编写代码
 
-5. 手动编译 直接 `tsc index.ts` 就可以了
+5. 手动编译 直接 `tsc index.js` 就可以了
 
 6. 自动编译 在 vscode 上终端->运行生成任务->tsc:监视 注意 只有使用 `tsc --init`才有任务列表
 
@@ -166,7 +166,7 @@
    - exclude: 用来指定那些 ts 文件不编译,`{ 'exclude':['./src/hello/**/*'] }` 意思见上
    - extends: 定义被继承的配置文件 配置文件太复杂了 我不想写 就可以继承之前设置过的配置文件 `{ 'extends': './config/base' }`
      意思是当前配置文件会包含 config 目录下的 base.json 的所有配置信息
-   - files: 指定需要被编译的 ts 文件的列表,文件少时才会使用 `{ 'files':[ 'base.ts', 'index.ts' ] }` 就会编译 base,index,ts 文件
+   - files: 指定需要被编译的 ts 文件的列表,文件少时才会使用 `{ 'files':[ 'base.ts', 'index.js' ] }` 就会编译 base,index,ts 文件
    - compilerOptions: 这是最重要的，我们初始化的 tsconfig.json 就会有这个对象，上面的选项与 compilerOptions 痛击，这个对象是编译器的选项，
      是一个对象，包含了很多很多的子选项，具体的可以看 tsconfig.json 的初始化信息。
      - target：编译为什么版本的 js，默认为 es3 兼容性好
