@@ -10,6 +10,7 @@
  * https://juejin.cn/post/6953452438300917790 掘金
  * https://www.zhihu.com/question/453677175 知乎 有对于 V8 源码的解读，也有一步一步从代码分析，也有总结发言
  * */
+const { throws } = require("assert");
 
 const _typeof = (p) => {
   return Object.prototype.toString.call(p).slice(8, -1).toLowerCase();
@@ -341,5 +342,11 @@ _Promise.deferred = function () {
 
   return result;
 };
+new Promise((resolve) => {
+  resolve('data')
+}).then().then().then((data) => {
+  console.log(data); // log: data
+})
+
 
 module.exports = _Promise;
