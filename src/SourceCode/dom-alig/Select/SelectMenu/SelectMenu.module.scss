@@ -1,0 +1,18 @@
+
+.select-menu {
+  --transition-duration: 150ms;
+  $background-color-menu: #2e2e2e;
+  width: 200px;
+  min-width: 0;
+  position: absolute;
+  background-color: $background-color-menu;
+  border-radius: 10px;
+  padding: 3px;
+  z-index: 1;
+  transition: opacity var(--transition-duration), transform var(--transition-duration);
+}
+
+.hidden {
+  opacity: 0;
+  visibility: hidden;
+}

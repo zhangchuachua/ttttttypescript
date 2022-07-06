@@ -1,0 +1,83 @@
+@use "sass:math";
+
+$height-exclude-border: 40px;
+$height-exclude-border-half: math.div($height-exclude-border, 2);
+$color-main: rgba(#fff, .6);
+$font-size-main: 16px;
+$width-icon: 14px;
+
+%text-ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.select {
+  display: inline-block;
+  min-width: 0;
+  height: $height-exclude-border;
+  margin: 0 auto;
+  font-size: $font-size-main;
+}
+
+.selector {
+  width: 100%;
+  height: 100%;
+  line-height: $height-exclude-border;
+  padding: 0 $height-exclude-border-half;
+  color: $color-main;
+  cursor: pointer;
+  position: relative;
+  border: 1px solid $color-main;
+  border-radius: $height-exclude-border-half;
+}
+
+.select-content {
+  @extend %text-ellipsis;
+  display: inline-block;
+  width: 100%;
+  //padding-right: $width-icon * 2;
+  user-select: none;
+  text-align: center;
+}
+
+.select-icon {
+  display: inline-block;
+  position: absolute;
+  right: $height-exclude-border-half;
+  top: 50%;
+  margin-top: math.div(-$height-exclude-border, 2);
+  transition: transform 300ms;
+}
+
+.option {
+  @extend %text-ellipsis;
+  color: #fff;
+  font-size: $font-size-main;
+  height: $font-size-main * 2;
+  line-height: 2em;
+  padding: 0 $height-exclude-border-half;
+  cursor: pointer;
+  width: 100%;
+  transition: all 150ms;
+  user-select: none;
+  margin-bottom: 3px;
+  text-align: center;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &:hover {
+    @extend .active;
+  }
+}
+
+.extend {
+  transform: rotate(180deg);
+}
+
+.active {
+  background-color: #2b73e5;
+  border-radius: 10px;
+}

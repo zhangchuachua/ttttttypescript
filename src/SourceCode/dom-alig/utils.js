@@ -117,7 +117,9 @@ function getScrollTop(w) {
  */
 function getOffset(el) {
   const pos = getClientPosition(el);
+  // *document
   const doc = el.ownerDocument;
+  // window
   const w = doc.defaultView || doc.parentWindow;
   pos.left += getScrollLeft(w);
   pos.top += getScrollTop(w);
@@ -303,17 +305,17 @@ function setLeftTop(elem, offset, option) {
       const dir = getOffsetDirection(key, option);
       // *获取预设值
       const preset = key === 'left' ? presetH : presetV;
-      // *off 是（原始值 减去 设置了预设值后的结果）；比如说一个元素原本的 left: 100 预设值为 -999 old['left'] = -899;  然后使用这个 100 - (-899)  = 999 这么做的原因应该是 获得某些情况造成的偏移，比如说原始 left 为 100 预设值为 -999 但是因为某些情况得到的 old['left'] !== -899
+      // *这里的 old 相当于 originalOffset[key] + preset 所以 off = originalOffset[key] - originalOffset[key] - preset = -preset
       const off = originalOffset[key] - old[key];
       if (dir === key) {
-        // *计算得出偏移情况，如果没有偏移情况那么应该是 0
+        // *所以这里相当于 preset + -preset 所以这里一般得出的结果为 0
         originalStyle[dir] = preset + off;
       } else {
         originalStyle[dir] = preset - off;
       }
     }
   }
-  // *将预设值替换为 originalStyle
+  // *将预设值替换为 originalStyle 一般结果为 {left: 0, top: 0 }
   css(elem, originalStyle);
   // force relayout 再次强制重绘
   forceRelayout(elem);
