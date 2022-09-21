@@ -97,33 +97,33 @@ const _typeof = (p) => {
  * !7. 然后依次 log 3, log 5 log 6
  * */
 
-_Promise
-  .resolve()
-  .then(() => {
-    console.log(0);
-    return _Promise.resolve(4);
-  })
-  .then((res) => {
-    console.log(res);
-  });
-
-_Promise
-  .resolve()
-  .then(() => {
-    console.log(1);
-  })
-  .then(() => {
-    console.log(2);
-  })
-  .then(() => {
-    console.log(3);
-  })
-  .then(() => {
-    console.log(5);
-  })
-  .then(() => {
-    console.log(6);
-  });
+// _Promise
+//   .resolve()
+//   .then(() => {
+//     console.log(0);
+//     return _Promise.resolve(4);
+//   })
+//   .then((res) => {
+//     console.log(res);
+//   });
+//
+// _Promise
+//   .resolve()
+//   .then(() => {
+//     console.log(1);
+//   })
+//   .then(() => {
+//     console.log(2);
+//   })
+//   .then(() => {
+//     console.log(3);
+//   })
+//   .then(() => {
+//     console.log(5);
+//   })
+//   .then(() => {
+//     console.log(6);
+//   });
 
 /** 解析 v8 源码的实现与我们的实现有些许不同
  *
@@ -159,5 +159,67 @@ _Promise
 // }).then(() =>{
 //   console.log(6);
 // })
+
+// *上面的解释在这里也可以适用。
+Promise.resolve().then(() => {
+  console.log(1);
+  return {
+    then(resolve, reject) {
+      console.log('then')
+      resolve('good');
+    }
+  }
+}).then(res => {
+  console.log(res)
+})
+
+
+Promise.resolve().then(() => {
+  console.log(2)
+}).then(() => {
+  console.log(3)
+})
+
+
+
+const async1 = async () => {
+  console.log('async1');
+  setTimeout(() => {
+    console.log('timer1')
+  }, 2000)
+  await new _Promise(resolve => {
+    console.log('promise1')
+  })
+  console.log('async1 end')
+  return 'async1 success'
+}
+console.log('script start');
+async1().then(res => console.log(res));
+console.log('script end');
+_Promise.resolve(1)
+  .then(2)
+  .then(_Promise.resolve(3))
+  .catch(4)
+  .then(res => console.log(res))
+setTimeout(() => {
+  console.log('timer2')
+}, 1000)
+
+
+/**
+ * !还是需要看一下 Promise 的源码
+ * 实际输出是：
+ * *script start -> async1 -> promise1 -> script end -> 1 -> timer2 -> timer1
+ *
+ * 让我没有想到的是 1 的位置。
+ * !看了大半天才看到 async1 里面的 Promise 没有 resolve，没有 resolve 就会导致一直是 Pending 状态，所以进入后面的 `console.log('async1 end'); return 'async1 success';`
+ * *其他的就都好解释了
+ * *根据 Promise 的源码，Promise.resolve(1) 哪里可以注意一下
+ * *Promise.resolve(1) 直接状态修改为 Fulfilled 然后这里的 .then(2) 因为 2 不是函数，所以替换为 (value) => value; 因为状态是 Fulfilled 所以直接放到微队列
+ * *然后 .then(Promise.resolve(3)) 先执行 Promise.resolve(3) 返回一个 Promise 因为 Promise 不是函数所以替换为 value => value; 然后因为此时状态是 Pending (之所以是 Pending，是因为 .then(1) 哪里才放到了微队列，都还没开始执行，所以当前的 Promise 是 Pending)所以会把 value => value 放到 onFulfilledList 里面去，等到 resolve 时才会执行。
+ * *.catch(4) 和 .then(res => console.log(res)) 都是一样，因为调用它们的 Promise 都是 Pending 所以不会立马放到微队列，而是等待之前的结果完成。
+ * *
+ */
+
 
 // ------------------- Promise 面试题 -------------------

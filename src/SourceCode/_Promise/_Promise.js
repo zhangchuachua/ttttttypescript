@@ -10,7 +10,6 @@
  * https://juejin.cn/post/6953452438300917790 掘金
  * https://www.zhihu.com/question/453677175 知乎 有对于 V8 源码的解读，也有一步一步从代码分析，也有总结发言
  * */
-const { throws } = require("assert");
 
 const _typeof = (p) => {
   return Object.prototype.toString.call(p).slice(8, -1).toLowerCase();
@@ -74,7 +73,7 @@ const resolvePromise = (promise, x, resolve, reject) => {
          * 3. 当 resolvePromise 和 rejectPromise 都被调用时，或者两者都被调用多次时，仅进行第一个调用， 这就是为什么需要声明一个 called 用来存储是否调用过。
          * */
 
-        // !注意：要想达到 Promise 原生的打印效果，必须将 then 的执行放到 微队列 中去，至于为什么，这是 ECMA 标准中规定的，暂时还不清楚。
+        // !注意：要想达到 v8 Promise 原生的打印效果，必须将 then 的执行放到 微队列 中去，至于为什么，这是 ECMA 标准中规定的，暂时还不清楚。
         queueMicrotask(() => {
           then.call(
             x,
@@ -342,11 +341,5 @@ _Promise.deferred = function () {
 
   return result;
 };
-new Promise((resolve) => {
-  resolve('data')
-}).then().then().then((data) => {
-  console.log(data); // log: data
-})
-
 
 module.exports = _Promise;

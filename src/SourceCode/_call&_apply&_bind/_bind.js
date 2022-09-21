@@ -94,18 +94,30 @@ function LateBloomer() {
 }
 
 // 在 1 秒钟后声明 bloom
-LateBloomer.prototype.bloom = function () {
-  window.setTimeout(this.declare.bind(this), 1000);
-};
-LateBloomer.prototype._bloom = function () {
-  window.setTimeout(this.declare._bind(this), 1000);
-};
-
-LateBloomer.prototype.declare = function () {
-  console.log('I am a beautiful flower with ' + this.petalCount + ' petals!');
-};
-
-var flower = new LateBloomer();
-flower.bloom(); // 一秒钟后, 调用 'declare' 方法
-flower._bloom();
+// LateBloomer.prototype.bloom = function () {
+//   window.setTimeout(this.declare.bind(this), 1000);
+// };
+// LateBloomer.prototype._bloom = function () {
+//   window.setTimeout(this.declare._bind(this), 1000);
+// };
+//
+// LateBloomer.prototype.declare = function () {
+//   console.log('I am a beautiful flower with ' + this.petalCount + ' petals!');
+// };
+//
+// var flower = new LateBloomer();
+// flower.bloom(); // 一秒钟后, 调用 'declare' 方法
+// flower._bloom();
 // module.exports = _bind;
+
+
+function logThis() {
+  console.log(this);
+}
+// *无论有多少个 bind 都相当于是绑定的第一个 this
+// *因为 bind 返回一个函数，所以后面的 bind 都相当于对这个返回的函数进行绑定 this 操作。
+// * logThis._bind({ b: 1 })._bind({ b: 2 }) => (function bind1(..args) { return logThis.call(this, ...args) })._bind({ b:2 }) => (function bind2(...args) { return bind1.call(this, ...args) }) 所以最终执行的 logThis.call(this, ...args) 的 this 还是 { b: 1 }
+const a = logThis._bind({ b: 1 })._bind({ b: 2 })
+a(); // {b: 1}
+const b = a._bind({ b: 4 });
+b(); // {b: 1}
