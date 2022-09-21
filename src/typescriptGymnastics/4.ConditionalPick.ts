@@ -16,7 +16,7 @@ type PickKeys<V, T> = {
 }[keyof V]; // !这里也很重要，这里可以得到当前 interface 的联合类型。 比如 interface A = { a:number, b: boolean, c: number | string }; A[keyof A] = number | boolean | string;
 
 // *所以PickKeys<Example, string> 的结果就是 'a' | never， 因为返回的是键名 但是还有一个问题， string extends string | number 应该是 true 但是结果里面并没有 'b'
-const a: PickKeys<Example, string> = 'a';
+type a =  PickKeys<Example, string>;
 
 export type ConditionalPick2<V, T> = {
   [K in PickKeys<V, T>]: V[K];
@@ -26,7 +26,7 @@ export type ConditionalPick2<V, T> = {
 type StringKeysOnly = ConditionalPick<Example, string>;
 //=> {a: string}
 
-type StringKeysOnly2 = ConditionalPick2<Example, string>;
+type StringKeysOnly2 = ConditionalPick2<Example, number>;
 
 const string: StringKeysOnly = {
   a: '',
