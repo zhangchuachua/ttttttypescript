@@ -11,8 +11,31 @@
  * SimpleVue的返回值类型可以是任意的。
  */
 
-const instance = {
+/* _____________ 你的代码 _____________ */
+// *其实重点就是 ThisType
+type ComputedReturnType<T> = T extends Record<string, () => any>
+  ? {
+    [P in keyof T]: ReturnType<T[P]>
+  }
+  : never
+
+interface Options<D, C, M> {
+  data: (this: void) => D
+  computed: C & ThisType<D>
+  methods: M & ThisType<D & M & ComputedReturnType<C>>
+}
+declare function SimpleVue<D, C, M>(options: Options<D, C, M>): any
+/* _____________ 测试用例 _____________ */
+
+SimpleVue({
   data() {
+    // @ts-expect-error
+    this.firstname
+    // @ts-expect-error
+    this.getRandom()
+    // @ts-expect-error
+    this.data()
+
     return {
       firstname: 'Type',
       lastname: 'Challenges',
@@ -21,13 +44,22 @@ const instance = {
   },
   computed: {
     fullname() {
-      return this.firstname + ' ' + this.lastname
-    }
+      // !因为上面使用了 ThisType 所以在 computed 里面可以使用 this.firstname
+      return `${this.firstname} ${this.lastname}`
+    },
   },
   methods: {
+    getRandom() {
+      return Math.random()
+    },
     hi() {
+      alert(this.amount)
       alert(this.fullname.toLowerCase())
-    }
-  }
-}
-
+      alert(this.getRandom())
+    },
+    test() {
+      const fullname = this.fullname
+      const cases: [] = [] as any
+    },
+  },
+})

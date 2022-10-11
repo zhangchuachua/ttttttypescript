@@ -6,7 +6,9 @@
 
 [体操题目](https://juejin.cn/post/7009046640308781063#heading-1)
 
-[题目答案-github 仓库](https://juejin.cn/post/7009046640308781063#heading-1)
+[题目答案-github 仓库](https://github.com/semlinker/awesome-typescript/issues)
+
+[typescript 官方手册](https://www.typescriptlang.org/docs/handbook)，已经说明很多概念性的东西，建议先看一下这个，作为基础
 
 ## 类型中的循环
 
@@ -187,7 +189,6 @@ type A = string | unknown extends unknown ? true : false; // *一切值都可以
 
 type B = string | never extends string ? true : false; // *never 感觉根本不会进入到式子中去?
 ```
-
 
 ### **any 引起的分发**
 
